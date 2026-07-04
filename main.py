@@ -46,9 +46,9 @@ def is_active_hours() -> bool:
 
 
 def is_daily_report_time() -> bool:
-    """Check if it's 22:30."""
+    """Check if it's after 22:00 (send daily report anytime after 22:00)."""
     now = datetime.now().time()
-    return time(22, 25) <= now <= time(22, 35)
+    return now >= time(22, 0)
 
 
 async def scrape_all(config: dict, db: VacancyDB) -> int:
@@ -154,13 +154,14 @@ async def main():
                         db.mark_shown([v[0] for v in digest])
                         logger.info(f"Published: {len(digest)}")
 
-                # 3. Daily report at 22:30
+                # 3. Daily report after 22:00
                 if is_daily_report_time() and not daily_report_sent:
                     all_today = db.get_today_shown()
-                    stats = db.get_stats()
-                    if await pub.publish_daily(all_today, stats):
-                        daily_report_sent = True
-                        logger.info("Daily report sent")
+                    if all_today:  # Only if there are vacancies to report
+                        stats = db.get_stats()
+                        if await pub.publish_daily(all_today, stats):
+                            daily_report_sent = True
+                            logger.info(f"Daily report sent: {len(all_today)} vacancies")
 
             else:
                 logger.info("Outside active hours (7:00-23:30), sleeping...")
