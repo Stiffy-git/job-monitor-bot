@@ -201,3 +201,20 @@ proxy:
 ```
 
 Подробнее: [AVITO-TUNNEL.md](AVITO-TUNNEL.md)
+
+## Android (Termux)
+
+Бот можно запустить на Android-телефоне через Termux:
+
+```bash
+# Установите Termux из F-Droid, затем:
+pkg install python git
+git clone https://github.com/Stiffy-git/job-monitor-bot.git
+cd job-monitor-bot
+pip install -r requirements.txt
+pip install playwright && playwright install chromium
+nano config.yaml  # настройте токен
+python3 main.py
+```
+
+Подробнее: [android/README.md](android/README.md)
